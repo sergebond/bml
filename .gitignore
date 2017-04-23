@@ -11,3 +11,9 @@ rel/example_project
 .concrete/DEV_MODE
 .rebar
 
+/bml.iml
+/.idea/
+/logs/
+/rel/
+/.erlang.mk/
+/ebin/
