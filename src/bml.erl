@@ -63,10 +63,11 @@ encode_attr(Attr, AttrsList) ->
   Res.
 
 encode_attr_values(Attr, AttrsList) ->
+
   Res =
     case get_index(Attr, ?CORE_ATTRS ++ AttrsList) of
       I when is_integer(I) ->
-        <<I:?>>;
+        <<I:?ATTR_VALUES_LENGTH>>;
       not_found -> not_found
 %%        throw({error, not_found})
     end,
