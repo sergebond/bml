@@ -1,20 +1,23 @@
 -author("serg").
 %% VERSION : 8
-%% tag:?TAG_LENGTH attrs_count:2 attr1 : ?ATTR_LENGTH attr_value_length:5 attr_value:attr_value_length ...
+%% tag:?TAG_LENGTH attrs_count:2 attr1:?ATTR_LENGTH attr_value_length:5 attr_value:attr_value_length ...
 
--define(VERSION, <<0:8>>).
-
--define(TAG_LENGTH, 7). % <<1:1, 1:1, 1:1, 1:1, 1:1, 1:1, 1:1>> = <<127:7>>
--define(ATTR_LENGTH, 5). % <<1:1, 1:1, 1:1, 1:1, 1:1>> = <<31:5>>
--define(ATTR_VALUES_LENGTH, 3).
--define().
+-define(VERSION_SIZE, 8).
+-define(TAG_LENGTH, 7). % <<1:1, 1:1, 1:1, 1:1, 1:1, 1:1, 1:1>> = << 127:7 >>
+-define(ATTRS_PREFIX_LENGTH, 3).
+-define(ATTR_KEY_LENGTH, 5). % <<1:1, 1:1, 1:1, 1:1, 1:1>> = << 31:5 >>
+-define(ATTR_VALUE_LENGTH, 3). % <<1:1, 1:1, 1:1>> = << 7:3 >>
+-define(ATTR_VALUE_PREFIX_LENGTH, 5). %% для длины значения атрибута в байтах. Ставится только когда незакодированное значение
+-define(CONTENT_PREFIX_SIZE, 7). %% для длины значения контента в байтах.
 
 -define(CORE_ATTRS,
   [<<"accesskey">>, <<"class">>, <<"contenteditable">>, <<"contextmenu">>, <<"dir">>, <<"hidden">>, <<"id">>,
     <<"lang">>, <<"spellcheck">>, <<"title">>,  <<"style">>, <<"tabindex">>, <<"title">>, <<"xml:lang">>]).
+
 -define(ATTR_VALUES, [
-  {<<"align">>, [<<"right">>, <<"left">>, <<"center">>]}, %% @todo
+  {<<"align">>, [<<"right">>, <<"left">>, <<"center">>, <<"top">>, <<"bottom">>]}, %% @todo
   {<<"valign">>, [<<"top">>, <<"middle">>, <<"bottom">>]}]).
+
 -define(TAGS_LIST, [
 %%  <<"!—…—">>, %	Используется для добавления комментариев.
 %%  <<"!DOCTYPE">>, %	Объявляет тип документа и предоставляет основную информацию для браузера — его язык и версия.

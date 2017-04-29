@@ -18,3 +18,4 @@ rel/example_project
 /rel/
 /.erlang.mk/
 /ebin/
+/_rel/
