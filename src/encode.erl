@@ -17,6 +17,10 @@
 %% API
 %%-export([decode_document/1]).
 -export([encode/1]).
+-export([
+  get_index/1,
+  get_index/2
+]).
 
 
 %%----------------------------------------------------------------------------------------------------------------------
@@ -81,12 +85,14 @@ tag(<<"<", Bin/binary>>) ->
     <<TagHeader:Len/binary, "/">> ->
       {Tag, EncTag, Attrs} = tag_header(TagHeader),
       {bjoin([EncTag, add_attrs_prefix(Attrs), enc_content([])]), Rest1};
+
 %%      {encode_tag(Tag, Attrs,[]), Rest1};
     TagHeader ->
       {Tag, EncTag, Attrs} = tag_header(TagHeader),
       {Content, Rest2} = tag_content(Rest1, Tag),
-      {bjoin([EncTag, add_attrs_prefix(Attrs) | Content]), Rest2}
 
+%%      {bjoin([EncTag, add_attrs_prefix(Attrs) | Content]), Rest2}
+      {{Tag, Attrs, Content}, Rest2}
 %%      {encode_tag(Tag, Attrs, Content), Rest2}
   end.
 
@@ -95,16 +101,14 @@ tag_header(Bin) ->
   {EncTag, List} = enc_tag(Tag),
   {Tag, EncTag,  tag_attrs(Rest, List)}.
 
-tag_attrs(<<>>, List) ->
+tag_attrs(<<>>, _List) ->
   [];
 tag_attrs(<<Blank, Bin/binary>>, List) when ?IS_BLANK(Blank) ->
   tag_attrs(Bin, List);
 tag_attrs(Bin, List) ->
   {Key, Value1} = bstring:split(Bin, <<"=">>),
   {Value2, Rest} = attr_value(Value1),
-
   EncAttrs = enc_attr_key_value(bstring:trim_right(Key), unescape(Value2), List ),
-
   [EncAttrs | tag_attrs(Rest, List)].
 
 %%  [{bstring:trim_right(Key), unescape(Value2)}|tag_attrs(Rest)].
@@ -135,9 +139,14 @@ tag_content(<<Blank, Bin/binary>>, Tag) when ?IS_BLANK(Blank) ->
   tag_content(Bin, Tag);
 tag_content(Bin, Tag) ->
   {A, _} = binary:match(Bin, <<"<">>),
+
   <<Text:A/binary, Rest1/binary>> = Bin,
+
+  ct:pal("A~p", [Text]),
+
   {Content, Rest2} = tag_content(Rest1, Tag),
-  {[enc_content(bstring:trim_right(unescape(Text)))|Content], Rest2}.
+  EncTextContent = enc_content(bstring:trim_right(unescape(Text))),
+  {[EncTextContent | Content], Rest2}.
 %%  {[bstring:trim_right(unescape(Text))|Content], Rest2}.
 
 unescape(Bin) ->
@@ -159,11 +168,12 @@ unescape(Bin) ->
 %% -----------------tag----------------------
 -spec enc_tag(binary()) -> {<<_:7>>|not_found, list()}.
 enc_tag(Tag) ->
+  ct:pal("~p", [Tag]),
   Res =
     case get_index(Tag) of
       {I, Attrs} when is_integer(I) ->
         {<<I:?TAG_LENGTH>>, Attrs};
-      non_found ->
+      not_found ->
         throw({error, not_found})
     end,
   Res.
@@ -209,10 +219,11 @@ enc_attr_value(Value, List) ->
 
 %% -----------------content----------------------
 enc_content([]) ->
+  ct:pal("ghgvh"),
   <<0:?CONTENT_PREFIX_SIZE>>;
 
 enc_content(Content) when is_binary(Content) ->
-%%  EncContent = zlib:zip(Content),
+  ct:pal("ghgvh ~p", Content),
   ContentSize = size(Content),
   <<ContentSize:?CONTENT_PREFIX_SIZE, Content/binary>>;
 
@@ -220,12 +231,12 @@ enc_content(Badrg) ->
   ct:pal("Dich ~p", [Badrg]).
 
 get_index(Tag) when is_binary(Tag) ->
-  get_index(Tag, ?TAGS_LIST, 0).
+  get_index(Tag, ?TAGS_LIST, 1).
 get_index(Attr, AttrsList) ->
-  get_index(Attr, AttrsList, 0).
+  get_index(Attr, AttrsList, 1).
 get_index(Tag, [{Tag, Attrs}|_], Index) ->
   {Index, Attrs};
-get_index(Attr, [Attr|_], Index) -> Index;
+get_index(Attr, [Attr|_], Index) -> Index ;
 get_index(_, [], _) -> not_found;
 get_index(Tag, [_|T], Index) ->
   get_index(Tag, T, Index + 1).
@@ -233,4 +244,3 @@ get_index(Tag, [_|T], Index) ->
 bjoin(List) ->
   F = fun(A, B) -> <<A/bitstring, B/bitstring>> end,
   lists:foldr(F, <<>>, List).
-

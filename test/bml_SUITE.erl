@@ -27,7 +27,7 @@ groups() ->
 
 all() ->
   [
-%%    my_test_case,
+%%    my_test_case
     two_direction_test
   ].
 
@@ -46,8 +46,9 @@ my_test_case(Config) ->
 two_direction_test(Config) ->
   FilePath = ?config(data_dir, Config) ++ "simple.html",
   {ok, BinaryFile} = file:read_file(FilePath),
+  ct:pal("~p", [BinaryFile]),
   Res0 = bml:encode(BinaryFile),
   ct:pal("Encoded is ~p", [Res0]),
   Res = decode:decode(1, Res0),
-  ct:pal("+++Decoded is ~p", [Res0]),
+  ct:pal("+++Decoded is ~p", [Res]),
   Config.
