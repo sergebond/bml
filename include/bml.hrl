@@ -4,11 +4,18 @@
 
 -define(VERSION_SIZE, 8).
 -define(TAG_LENGTH, 7). % <<1:1, 1:1, 1:1, 1:1, 1:1, 1:1, 1:1>> = << 127:7 >>
+
 -define(ATTRS_PREFIX_LENGTH, 3).
 -define(ATTR_KEY_LENGTH, 5). % <<1:1, 1:1, 1:1, 1:1, 1:1>> = << 31:5 >>
 -define(ATTR_VALUE_LENGTH, 3). % <<1:1, 1:1, 1:1>> = << 7:3 >>
--define(ATTR_VALUE_PREFIX_LENGTH, 5). %% для длины значения атрибута в байтах. Ставится только когда незакодированное значение
--define(CONTENT_PREFIX_SIZE, 7). %% для длины значения контента в байтах.
+-define(ATTR_VALUE_PREFIX_LENGTH, 5). %%  << 31:5 >> для длины значения атрибута в байтах. Ставится только когда незакодированное значение
+
+-define(CONTENT_PREFIX_SIZE, 5). %% << 31:5 >>
+
+-define(STRING_MARKER, 0:?TAG_LENGTH ).
+-define(STRING_LENGTH_SIZE, 8). %% Max 2^8 = 256 bytes
+-define(STRING_PREFIX_SIZE, ?TAG_LENGTH + ?STRING_LENGTH_SIZE). %% для длины значения строкового контента в байтах.
+-define(STRING_CONTENT_PREFIX(Length), 0:?TAG_LENGTH, Length:?STRING_LENGTH_SIZE ).
 
 -define(CORE_ATTRS,
   [<<"accesskey">>, <<"class">>, <<"contenteditable">>, <<"contextmenu">>, <<"dir">>, <<"hidden">>, <<"id">>,
