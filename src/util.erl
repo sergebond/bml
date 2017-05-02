@@ -19,4 +19,3 @@ get_value(Key, List, Default) ->
 bjoin([]) -> <<>>;
 bjoin([H|T]) ->
   << H/bitstring, (bjoin(T))/bitstring >>.
-

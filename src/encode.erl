@@ -15,56 +15,17 @@
 ).
 
 %% API
-%%-export([decode_document/1]).
 -export([encode/1]).
--export([
-  get_index/1,
-  get_index/2
-]).
-
 
 %%----------------------------------------------------------------------------------------------------------------------
 %%                                        PRIVATE
 %%----------------------------------------------------------------------------------------------------------------------
-
-%% API
-%%decode_document(Bin) when is_binary(Bin) ->
-%%  {Version, Encoding, Rest1} = prolog(bstring:trim_left(Bin)),
-%%  Rest2 = skip_doctype(bstring:trim_left(Bin)),
-%%  {Tag, _Rest} = tag(bstring:trim_left(Rest2)),
-%%  {xml, Tag}.
-%%
 encode(Bin) when is_binary(Bin) ->
   Rest1 = skip_prolog(bstring:trim_left(Bin)),
   Rest2 = skip_doctype(bstring:trim_left(Rest1)),
   {Tag, _Rest} = tag(bstring:trim_left(Rest2)),
   Tag.
 
-%%%% internal
-%%prolog(<<"<?xml", Bin/binary>>) ->
-%%  {Prolog, Rest} = bstring:split(Bin, <<"?>">>),
-%%  Attrs = tag_attrs(Prolog),
-%%  {get_version(Attrs), get_encoding(Attrs), Rest}.
-%%
-%%get_version(Attrs) ->
-%%  case util:get_value(<<"version">>, Attrs) of
-%%    <<"1.0">> -> '1.0';
-%%    <<"1.1">> -> '1.1'
-%%  end.
-%%
-%%get_encoding(Attrs) ->
-%%  Encoding = util:get_value(<<"encoding">>, Attrs),
-%%  case bstring:to_lower(Encoding) of
-%%    <<"iso-8859-1">>    -> latin1;
-%%    <<"iso_8859_1">>    -> latin1;
-%%    <<"iso_8859-1">>    -> latin1;
-%%    <<"iso8859-1">>     -> latin1;
-%%    <<"utf-8">>         -> utf8;
-%%    <<"utf_8">>         -> utf8;
-%%    <<"utf8">>          -> utf8;
-%%    <<>>                -> undefined;
-%%    _                   -> unknown
-%%  end.
 
 skip_prolog(<<"<?xml", Bin/binary>>) ->
   {_, Rest} = bstring:split(Bin, <<"?>">>),
@@ -109,9 +70,7 @@ tag_attrs(Bin, List) ->
 attr_value(<<Blank, Bin/binary>>) when ?IS_BLANK(Blank) ->
   attr_value(Bin);
 attr_value(<<Quote, Value/binary>>) when ?IS_QUOTE(Quote) ->
-  bstring:split(Value, <<Quote>>);
-
-attr_value(Dich) -> ct:pal("+++++ ~p", [Dich]).
+  bstring:split(Value, <<Quote>>).
 
 tag_content(<<"<![CDATA[", Bin/binary>>, Tag) ->
   {Text, Rest1} = bstring:split(Bin, <<"]]>">>),

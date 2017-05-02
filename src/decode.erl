@@ -55,7 +55,6 @@ read_attr_value(DecodedAttr, Bin) ->
   end.
 
 %% --------------------Content----------------------------------------
-
 content(<<Count:?CONTENT_PREFIX_SIZE, Rest/bitstring >>) ->
   read_content(Rest, Count, <<>>).
 
@@ -80,5 +79,3 @@ get_tag(Index) ->
 
 get_attr_key(Index, List) -> lists:nth(Index, List).
 get_attr_value(Index, List) -> get_attr_key(Index, List).
-
-
