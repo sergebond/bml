@@ -28,22 +28,22 @@ groups() ->
 
 all() ->
   [
-    my_test_case,
     two_direction_test, %% Только на 500
-    two_direction_test2
+    two_direction_test2,
+    my_test_case
   ].
 
 my_test_case(Config) ->
   FilePath = ?config(data_dir, Config) ++ "simple.html",
   {ok, BinaryFile} = file:read_file(FilePath),
-  Size1 = byte_size(BinaryFile),
-  Size12 = size(zlib:gzip(BinaryFile)),
+  Size1 = bit_size(BinaryFile),
+  Size12 = bit_size(zlib:gzip(BinaryFile)),
   Res = bml:encode(BinaryFile),
-  Encoded = byte_size(Res),
-  ct:pal("Result is ~p", [Res]),
-  EncodedZipped = (catch size(zlib:gzip(Res))),
-%%  ct:pal("RawSize ~p,~n RawZipped ~p, ~n EncodedSize ~p,~n EncodedZipped ~p", [Size1, Size12, Encoded, EncodedZipped] ),
-  ok.
+  Encoded = bit_size(Res),
+%%  ct:pal("Result is ~p", [Res]),
+%%  EncodedZipped = (catch size(zlib:gzip(Res))),
+  ct:pal("RawSize ~p,~n RawZipped ~p, ~n EncodedSize ~p", [Size1, Size12, Encoded] ),
+  Config.
 
 two_direction_test(Config) ->
   FilePath = ?config(data_dir, Config) ++ "simple.html",
